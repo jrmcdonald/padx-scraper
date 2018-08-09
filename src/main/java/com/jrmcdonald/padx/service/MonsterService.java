@@ -1,19 +1,14 @@
 package com.jrmcdonald.padx.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.jrmcdonald.padx.common.Constants;
 import com.jrmcdonald.padx.model.Monster;
-
+import com.jrmcdonald.padx.repositories.MonsterRepository;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -38,6 +33,9 @@ public class MonsterService {
     @Autowired
     private ApplicationContext applicationContext;
 
+    @Autowired
+    MonsterRepository monsterRepository;
+
     public int execute() {
         int status = 0;
 
@@ -45,19 +43,14 @@ public class MonsterService {
             long startTime = System.nanoTime();
             logger.info("Started execution");
 
-            ArrayList<Long> monsterIds = fetchMonsterIds();
-
-            ArrayList<Future<Monster>> results = monsterIds.stream()
+            ArrayList<Future<Monster>> results = fetchMonsterIds().stream()
                     .map(id -> applicationContext.getBean(MonsterDataTask.class, id))
                     .map(task -> taskExecutor.submit(task))
                     .collect(Collectors.toCollection(ArrayList::new));
 
-            HashMap<Long, Monster> monsters = new HashMap<Long, Monster>();
-
             for (Future<Monster> result : results) {
                 try {
-                    Monster monster = result.get();
-                    monsters.put(monster.getId(), monster);
+                    result.get();
                 } catch (InterruptedException | ExecutionException ex) {
                     ex.printStackTrace();
                 }
@@ -65,15 +58,12 @@ public class MonsterService {
 
             taskExecutor.shutdown();
 
-            ObjectMapper mapper = new ObjectMapper();
-            ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
-
-            writer.writeValue(new File(Constants.DEFAULT_FILE), monsters);
-
             long endTime = System.nanoTime();
             long duration = (endTime - startTime) / 1000000 / 1000;
 
             logger.info("Finished execution. Completed in {}s", duration);
+
+            monsterRepository.count();
         } catch (Exception e) {
             logger.error("An unexpected exception occurred: ", e);
             status = 1;

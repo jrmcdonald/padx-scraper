@@ -52,7 +52,7 @@ public final class MonsterHelpers {
         Element materialsCell = evolutionCell.nextElementSibling();
         addMaterialsToEvolution(materialsCell, evo);
 
-        monster.getEvolutions().add(evo);
+        monster.addEvolution(evo);
     }
 
     private static void determineUltimateEvolutions(Monster monster, Elements filteredRows) throws InvalidMonsterException {
@@ -70,7 +70,7 @@ public final class MonsterHelpers {
             Element materialsCell = evolutionCell.previousElementSibling();
             addMaterialsToEvolution(materialsCell, evo);
 
-            monster.getEvolutions().add(evo);
+            monster.addEvolution(evo);
         }
     }
 
@@ -96,7 +96,7 @@ public final class MonsterHelpers {
 
         addMaterialsToEvolution(evoMatsCell, evo);
 
-        monster.getEvolutions().add(evo);
+        monster.addEvolution(evo);
     }
 
     private static Element getEvolutionCellByClass(Element row, String className) {
