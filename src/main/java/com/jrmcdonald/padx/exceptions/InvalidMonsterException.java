@@ -1,4 +1,4 @@
-package com.jrmcdonald.padx.common;
+package com.jrmcdonald.padx.exceptions;
 
 public class InvalidMonsterException extends Exception {
 
