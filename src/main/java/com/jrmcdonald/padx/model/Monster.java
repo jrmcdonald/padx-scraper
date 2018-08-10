@@ -1,7 +1,8 @@
 package com.jrmcdonald.padx.model;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -17,7 +18,7 @@ public class Monster {
     private String type;
     
     @OneToMany(mappedBy = "monster", fetch = FetchType.EAGER, cascade = { CascadeType.ALL }, orphanRemoval = true)
-    private Set<Evolution> evolutions = new HashSet<Evolution>();
+    private Set<Evolution> evolutions = new LinkedHashSet<Evolution>();
 
     /**
      * @return the id

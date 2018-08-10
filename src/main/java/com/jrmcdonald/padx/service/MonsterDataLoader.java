@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Component;
  * MonsterDataLoader
  */
 @Component
+@Profile("!unit-test")
 public class MonsterDataLoader implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(MonsterDataLoader.class);
