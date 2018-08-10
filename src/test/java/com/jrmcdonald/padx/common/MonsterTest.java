@@ -8,13 +8,10 @@ import java.io.IOException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jrmcdonald.padx.model.Monster;
 
-import org.springframework.test.context.ActiveProfiles;
-
 /**
  * MonsterTest
  */
-@ActiveProfiles("unit-test")
-public class MonsterTest {
+public class MonsterTest extends BaseTest {
 
     public void assertThatMonstersAreEqual(Monster source, Monster comparator) {
         compare(source, comparator);
