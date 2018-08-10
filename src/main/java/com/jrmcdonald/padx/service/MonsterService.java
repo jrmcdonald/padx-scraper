@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import com.jrmcdonald.padx.common.Constants;
 import com.jrmcdonald.padx.model.Monster;
-import com.jrmcdonald.padx.repositories.MonsterRepository;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -32,9 +31,6 @@ public class MonsterService {
 
     @Autowired
     private ApplicationContext applicationContext;
-
-    @Autowired
-    MonsterRepository monsterRepository;
 
     public int execute() {
         int status = 0;
@@ -62,8 +58,6 @@ public class MonsterService {
             long duration = (endTime - startTime) / 1000000 / 1000;
 
             logger.info("Finished execution. Completed in {}s", duration);
-
-            monsterRepository.count();
         } catch (Exception e) {
             logger.error("An unexpected exception occurred: ", e);
             status = 1;
