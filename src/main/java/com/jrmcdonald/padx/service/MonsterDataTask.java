@@ -5,9 +5,10 @@ import java.net.SocketTimeoutException;
 import java.util.concurrent.Callable;
 
 import com.jrmcdonald.padx.common.Constants;
-import com.jrmcdonald.padx.common.InvalidMonsterException;
 import com.jrmcdonald.padx.common.MonsterHelpers;
+import com.jrmcdonald.padx.exceptions.InvalidMonsterException;
 import com.jrmcdonald.padx.model.Monster;
+import com.jrmcdonald.padx.repositories.MonsterRepository;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -15,6 +16,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -27,6 +29,9 @@ import org.springframework.stereotype.Component;
 public class MonsterDataTask implements Callable<Monster> {
 
     private static final Logger logger = LoggerFactory.getLogger(MonsterDataTask.class); 
+
+    @Autowired
+    MonsterRepository monsters;
 
     @Value("${connection.retries}")
     private int maxRetries;
@@ -74,6 +79,8 @@ public class MonsterDataTask implements Callable<Monster> {
         } catch (IOException ex) {
             logger.error("Unable to load data for monster id {}: {}", id, ex);
         }
+
+        monsters.save(monster);
 
         return monster;
     }

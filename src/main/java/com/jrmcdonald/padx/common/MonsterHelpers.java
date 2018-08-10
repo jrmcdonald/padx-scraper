@@ -2,17 +2,17 @@ package com.jrmcdonald.padx.common;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
-import com.jrmcdonald.padx.common.InvalidMonsterException;
-import com.jrmcdonald.padx.common.MonsterPredicates;
+
+import com.jrmcdonald.padx.common.Constants.EvolutionType;
+import com.jrmcdonald.padx.exceptions.InvalidMonsterException;
 import com.jrmcdonald.padx.model.Evolution;
 import com.jrmcdonald.padx.model.Monster;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static com.jrmcdonald.padx.common.Constants.EvolutionType;
 
 public final class MonsterHelpers {
 
@@ -52,7 +52,7 @@ public final class MonsterHelpers {
         Element materialsCell = evolutionCell.nextElementSibling();
         addMaterialsToEvolution(materialsCell, evo);
 
-        monster.getEvolutions().add(evo);
+        monster.addEvolution(evo);
     }
 
     private static void determineUltimateEvolutions(Monster monster, Elements filteredRows) throws InvalidMonsterException {
@@ -70,7 +70,7 @@ public final class MonsterHelpers {
             Element materialsCell = evolutionCell.previousElementSibling();
             addMaterialsToEvolution(materialsCell, evo);
 
-            monster.getEvolutions().add(evo);
+            monster.addEvolution(evo);
         }
     }
 
@@ -96,7 +96,7 @@ public final class MonsterHelpers {
 
         addMaterialsToEvolution(evoMatsCell, evo);
 
-        monster.getEvolutions().add(evo);
+        monster.addEvolution(evo);
     }
 
     private static Element getEvolutionCellByClass(Element row, String className) {

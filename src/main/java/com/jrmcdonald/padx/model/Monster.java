@@ -1,13 +1,24 @@
 package com.jrmcdonald.padx.model;
 
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
+@Entity
 public class Monster {
 
+    @Id
     private Long id;
     private String name;
     private String type;
-    private ArrayList<Evolution> evolutions;
+    
+    @OneToMany(mappedBy = "monster", fetch = FetchType.EAGER, cascade = { CascadeType.ALL }, orphanRemoval = true)
+    private Set<Evolution> evolutions = new LinkedHashSet<Evolution>();
 
     /**
      * @return the id
@@ -54,18 +65,21 @@ public class Monster {
     /**
      * @return the evolutions
      */
-    public ArrayList<Evolution> getEvolutions() {
-      if (evolutions == null) {
-        evolutions = new ArrayList<Evolution>();
-      }
+    public Set<Evolution> getEvolutions() {
       return evolutions;
     }
     
     /**
      * @param evolutions the evolutions to set
      */
-    public void setEvolutions(ArrayList<Evolution> evolutions) {
+    public void setEvolutions(Set<Evolution> evolutions) {
       this.evolutions = evolutions;
+      evolutions.forEach(evo -> evo.setMonster(this));
+    }
+
+    public void addEvolution(Evolution evolution) {
+      evolutions.add(evolution);
+      evolution.setMonster(this);
     }
 
     @Override
