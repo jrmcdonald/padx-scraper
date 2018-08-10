@@ -29,7 +29,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class MonsterDataTaskTest extends MonsterTest {
 
     @Autowired
-    private ThreadPoolTaskExecutor taskExecutor;
+    private ThreadPoolTaskExecutor testTaskExecutor;
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -145,7 +145,7 @@ public class MonsterDataTaskTest extends MonsterTest {
 
 	private Monster callMonsterDataTask(long id) {
 		MonsterDataTask task = applicationContext.getBean(MonsterDataTask.class, id);
-        Future<Monster> result = taskExecutor.submit(task);
+        Future<Monster> result = testTaskExecutor.submit(task);
 
         Monster monster = null;
 
