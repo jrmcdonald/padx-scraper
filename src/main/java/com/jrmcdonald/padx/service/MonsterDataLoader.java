@@ -2,12 +2,16 @@ package com.jrmcdonald.padx.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import com.jrmcdonald.padx.common.Constants;
 import com.jrmcdonald.padx.model.Monster;
+import com.jrmcdonald.padx.model.Status;
+import com.jrmcdonald.padx.model.Status.StatusEnum;
+import com.jrmcdonald.padx.repositories.StatusRepository;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -36,11 +40,16 @@ public class MonsterDataLoader implements CommandLineRunner {
     @Autowired
     private ApplicationContext applicationContext;
 
+    @Autowired
+    private StatusRepository statusRepository;
+
     @Override
     public void run(String... args) {
         try {
             long startTime = System.nanoTime();
             logger.info("Started execution");
+
+            statusRepository.save(new Status(StatusEnum.UPDATING, new Date(), 0L));
 
             ArrayList<Future<Monster>> results = fetchMonsterIds().stream()
                     .map(id -> applicationContext.getBean(MonsterDataTask.class, id))
@@ -56,6 +65,8 @@ public class MonsterDataLoader implements CommandLineRunner {
             }
 
             taskExecutor.shutdown();
+
+            statusRepository.save(new Status(StatusEnum.READY, new Date(), results.size()));
 
             long endTime = System.nanoTime();
             long duration = (endTime - startTime) / 1000000 / 1000;
