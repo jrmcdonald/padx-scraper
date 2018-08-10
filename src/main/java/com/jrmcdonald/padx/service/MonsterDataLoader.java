@@ -8,23 +8,27 @@ import java.util.stream.Collectors;
 
 import com.jrmcdonald.padx.common.Constants;
 import com.jrmcdonald.padx.model.Monster;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 /**
- * MonsterService
+ * MonsterDataLoader
  */
-@Service
-public class MonsterService {
+@Component
+@Profile("!unit-test")
+public class MonsterDataLoader implements CommandLineRunner {
 
-    private static final Logger logger = LoggerFactory.getLogger(MonsterService.class);
+    private static final Logger logger = LoggerFactory.getLogger(MonsterDataLoader.class);
 
     @Autowired
     private ThreadPoolTaskExecutor taskExecutor;
@@ -32,9 +36,8 @@ public class MonsterService {
     @Autowired
     private ApplicationContext applicationContext;
 
-    public int execute() {
-        int status = 0;
-
+    @Override
+    public void run(String... args) {
         try {
             long startTime = System.nanoTime();
             logger.info("Started execution");
@@ -60,10 +63,7 @@ public class MonsterService {
             logger.info("Finished execution. Completed in {}s", duration);
         } catch (Exception e) {
             logger.error("An unexpected exception occurred: ", e);
-            status = 1;
         }
-
-        return status;
     }
     
     private ArrayList<Long> fetchMonsterIds() throws IOException {

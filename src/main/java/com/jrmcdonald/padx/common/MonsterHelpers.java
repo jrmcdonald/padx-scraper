@@ -2,17 +2,17 @@ package com.jrmcdonald.padx.common;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
-import com.jrmcdonald.padx.common.InvalidMonsterException;
-import com.jrmcdonald.padx.common.MonsterPredicates;
+
+import com.jrmcdonald.padx.common.Constants.EvolutionType;
+import com.jrmcdonald.padx.exceptions.InvalidMonsterException;
 import com.jrmcdonald.padx.model.Evolution;
 import com.jrmcdonald.padx.model.Monster;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static com.jrmcdonald.padx.common.Constants.EvolutionType;
 
 public final class MonsterHelpers {
 

@@ -5,8 +5,8 @@ import java.net.SocketTimeoutException;
 import java.util.concurrent.Callable;
 
 import com.jrmcdonald.padx.common.Constants;
-import com.jrmcdonald.padx.common.InvalidMonsterException;
 import com.jrmcdonald.padx.common.MonsterHelpers;
+import com.jrmcdonald.padx.exceptions.InvalidMonsterException;
 import com.jrmcdonald.padx.model.Monster;
 import com.jrmcdonald.padx.repositories.MonsterRepository;
 
