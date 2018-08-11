@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  * StatusController
  */
 @RestController
+@RequestMapping("/api")
 public class StatusController {
 
     @Autowired
