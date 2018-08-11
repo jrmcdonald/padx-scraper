@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
  * MonsterController
  */
 @RestController
+@RequestMapping("/api")
 public class MonsterController {
 
     @Autowired
