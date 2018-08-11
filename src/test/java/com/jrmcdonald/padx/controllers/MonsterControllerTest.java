@@ -83,7 +83,7 @@ public class MonsterControllerTest extends MonsterTest {
 
         given(monsterRepository.findAll()).willReturn(allMonsters);
 
-        MvcResult result = mvc.perform(get("/monsters").contentType(MediaType.APPLICATION_JSON))
+        MvcResult result = mvc.perform(get("/api/monsters").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -97,7 +97,7 @@ public class MonsterControllerTest extends MonsterTest {
 
         given(monsterRepository.findById(238L)).willReturn(Optional.ofNullable(allMonsters.get(0)));
 
-        MvcResult result = mvc.perform(get("/monsters/238").contentType(MediaType.APPLICATION_JSON))
+        MvcResult result = mvc.perform(get("/api/monsters/238").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -111,7 +111,7 @@ public class MonsterControllerTest extends MonsterTest {
 
         given(monsterRepository.findById(239L)).willReturn(Optional.ofNullable(null));
 
-        mvc.perform(get("/monsters/239").contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(get("/api/monsters/239").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 }
