@@ -122,9 +122,9 @@ public final class MonsterHelpers {
                 Elements evolveCells = sourceRow.children();
 
                 if (elementsContainIdAndReincarnation(evolveCells, id)) {
-                    evoType = EvolutionType.FINAL;
-                } else {
                     evoType = EvolutionType.REINCARNATION;
+                } else {
+                    evoType = EvolutionType.FINAL;
                 }
             } else {
                 evoType = EvolutionType.FINAL;
