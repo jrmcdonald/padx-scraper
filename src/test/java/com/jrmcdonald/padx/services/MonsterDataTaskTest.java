@@ -134,8 +134,31 @@ public class MonsterDataTaskTest extends MonsterTest {
         genericTest(id, monster);
     }
 
+    @Test
+    public void testLoadFinalEvolution_FixIssue4() {
+        long id = 995L;
+
+        Monster monster = new Monster();
+        monster.setId(id);
+        monster.setType("God / Attacker");
+        monster.setName("Blazing Deity Falcon, Horus");
+        
+        Evolution evolution = new Evolution();
+        evolution.setEvolution(2927L);
+        evolution.setUltimate(true);
+        evolution.putOrIncrementMaterial(147L);
+        evolution.putOrIncrementMaterial(321L);
+        evolution.putOrIncrementMaterial(171L);
+        evolution.putOrIncrementMaterial(915L);
+        evolution.putOrIncrementMaterial(915L);
+        monster.addEvolution(evolution);
+
+        genericTest(id, monster);
+    }
+
 	private void genericTest(long id, Monster monster) {
-		Monster fetchedMonster = callMonsterDataTask(id);
+        Monster fetchedMonster = callMonsterDataTask(id);
+
         assertThatMonstersAreEqual(monster, fetchedMonster);
 
         Optional<Monster> foundMonster = monsterRepository.findById(id);

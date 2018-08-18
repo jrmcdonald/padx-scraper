@@ -133,8 +133,8 @@ public class Evolution {
     @Override
     public String toString() {
         return String.format(
-                "Evolution[evolution=%d, ultimate='%s', materials='%s']",
-                evolution, ultimate, materials);
+                "Evolution[evolution=%d, ultimate='%s', reincarnation='%s' materials='%s']",
+                evolution, ultimate, reincarnation, materials);
     }
 
 }

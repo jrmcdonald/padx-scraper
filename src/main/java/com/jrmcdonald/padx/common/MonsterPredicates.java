@@ -18,7 +18,8 @@ public final class MonsterPredicates {
     }
 
     public static Predicate<Element> isReincarnation() {
-        return e -> !(e.getElementsByClass("awokenevolve").isEmpty());
+        return e -> !(e.getElementsByClass("awokenevolve").isEmpty()) 
+            && e.getElementsByClass("awokenevolve").first().getElementsByAttributeValueContaining("alt", "Reincarnation").isEmpty();
     }
     
     public static Predicate<Element> containsMonsterBookId(long id) {
