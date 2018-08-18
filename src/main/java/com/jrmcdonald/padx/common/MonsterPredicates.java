@@ -17,9 +17,16 @@ public final class MonsterPredicates {
         return e -> !(e.getElementsByClass("finalevolve").isEmpty());
     }
 
+    public static Predicate<Element> isAwokenEvolve() {
+        return e -> !(e.getElementsByClass("awokenevolve").isEmpty());
+    }
+
+    public static Predicate<Element> isUltimateToUltimate() {
+        return e -> e.getElementsByClass("awokenevolve").first().getElementsByAttributeValueContaining("alt", "Reincarnated").isEmpty();
+    }
+
     public static Predicate<Element> isReincarnation() {
-        return e -> !(e.getElementsByClass("awokenevolve").isEmpty()) 
-            && e.getElementsByClass("awokenevolve").first().getElementsByAttributeValueContaining("alt", "Reincarnation").isEmpty();
+        return e -> !(e.getElementsByClass("awokenevolve").first().getElementsByAttributeValueContaining("alt", "Reincarnated").isEmpty());
     }
     
     public static Predicate<Element> containsMonsterBookId(long id) {
