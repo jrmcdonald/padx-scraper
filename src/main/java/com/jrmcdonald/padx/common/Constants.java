@@ -13,6 +13,7 @@ public final class Constants {
     public static enum EvolutionType {
         NORMAL,
         ULTIMATE,
+        ULTIMATE_TO_ULTIMATE,
         REINCARNATION,
         FINAL
     } 
