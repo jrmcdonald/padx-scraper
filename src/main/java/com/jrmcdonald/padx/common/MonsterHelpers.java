@@ -34,12 +34,28 @@ public final class MonsterHelpers {
             case REINCARNATION:
                 determineReincarnatedEvolution(monster, sourceRow);
                 break;
+            case ULTIMATE_TO_ULTIMATE:
+                determineUltimateToUltimateEvolution(monster, sourceRow);
+                break;
             case FINAL:
                 // no evolutions
             default:
                 // no evolutions
                 break;
         }
+    }
+
+    private static void determineUltimateToUltimateEvolution(Monster monster, Element sourceRow) throws InvalidMonsterException {
+        Evolution evo = new Evolution();
+        evo.setUltimate(true);
+
+        Element evolutionCell = getEvolutionCellByClass(sourceRow, "awokenevolve");
+        evo.setEvolution(findAndParseMonsterId(evolutionCell));
+
+        Element materialsCell = evolutionCell.nextElementSibling();
+        addMaterialsToEvolution(materialsCell, evo);
+
+        monster.addEvolution(evo);
     }
 
     private static void determineReincarnatedEvolution(Monster monster, Element sourceRow) throws InvalidMonsterException {
@@ -118,14 +134,12 @@ public final class MonsterHelpers {
                 evoType = EvolutionType.ULTIMATE;
             }
         } else {
-            if (elementsContainIdAndReincarnation(filteredRows, id)) {
-                Elements evolveCells = sourceRow.children();
+            Elements evolveCells = sourceRow.children();
 
-                if (elementsContainIdAndReincarnation(evolveCells, id)) {
-                    evoType = EvolutionType.FINAL;
-                } else {
-                    evoType = EvolutionType.REINCARNATION;
-                }
+            if (elementsContainReincarnation(evolveCells)) {
+                evoType = EvolutionType.REINCARNATION;
+            } else if (elementsContainUltimateToUltimate(evolveCells)) {
+                evoType = EvolutionType.ULTIMATE_TO_ULTIMATE;
             } else {
                 evoType = EvolutionType.FINAL;
             }
@@ -198,10 +212,17 @@ public final class MonsterHelpers {
         }
     }
 
-    private static boolean elementsContainIdAndReincarnation(Elements elements, long id) {
+    private static boolean elementsContainUltimateToUltimate(Elements elements) {
         return elements.stream()
+                .filter(MonsterPredicates.isAwokenEvolve())
+                .filter(MonsterPredicates.isUltimateToUltimate())
+                .count() > 0;
+    }
+
+    private static boolean elementsContainReincarnation(Elements elements) {
+        return elements.stream()
+                .filter(MonsterPredicates.isAwokenEvolve())
                 .filter(MonsterPredicates.isReincarnation())
-                .filter(MonsterPredicates.containsMonsterBookId(id))
                 .count() > 0;
     }
 }

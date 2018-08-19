@@ -4,8 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jrmcdonald.padx.model.Evolution;
 import com.jrmcdonald.padx.model.Monster;
 
 /**
@@ -29,6 +34,27 @@ public class MonsterTest extends BaseTest {
 
     private void compare(Monster source, Monster comparator) {
         assertThat(source).isEqualToIgnoringGivenFields(comparator, "evolutions");
-        assertThat(source.getEvolutions().containsAll(comparator.getEvolutions()));
+
+        List<Evolution> sourceEvolutions = new ArrayList<Evolution>(source.getEvolutions());
+        List<Evolution> comparatorEvolutions = new ArrayList<Evolution>(comparator.getEvolutions());
+
+        assertThat(sourceEvolutions.size()).isEqualTo(comparatorEvolutions.size());
+
+        for (int i = 0; i < sourceEvolutions.size(); i++) {
+            Evolution sourceEvo = sourceEvolutions.get(i);
+            Evolution comparatorEvo = comparatorEvolutions.get(i);
+
+            assertThat(sourceEvo).isEqualToIgnoringGivenFields(comparatorEvo, "id", "monster", "materials");
+
+            Map<Long, AtomicLong> sourceMaterials = sourceEvo.getMaterials();
+            Map<Long, AtomicLong> comparatorMaterials = comparatorEvo.getMaterials();
+
+            assertThat(sourceMaterials.size()).isEqualTo(comparatorMaterials.size());
+
+            for (Long id : sourceMaterials.keySet()) {
+                assertThat(comparatorMaterials.containsKey(id)).isTrue();
+                assertThat(comparatorMaterials.get(id).get()).isEqualTo(sourceMaterials.get(id).get());
+            }
+        }
     }
 }
