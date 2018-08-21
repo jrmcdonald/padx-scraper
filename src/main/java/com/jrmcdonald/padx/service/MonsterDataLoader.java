@@ -26,10 +26,15 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 /**
- * MonsterDataLoader
+ * Monster Data Loader
+ * 
+ * <p>Instance of {@link CommandLineRunner} that loads monster data into memory
+ * 
+ * @author Jamie McDonald
+ * @since 0.2
  */
 @Component
-@Profile("!unit-test")
+@Profile("!unit-test") // do not run this class during testing scenarios
 public class MonsterDataLoader implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(MonsterDataLoader.class);
@@ -43,6 +48,11 @@ public class MonsterDataLoader implements CommandLineRunner {
     @Autowired
     private StatusRepository statusRepository;
 
+    /**
+     * Overridden run method
+     * 
+     * @param args
+     */
     @Override
     public void run(String... args) {
         try {
@@ -51,11 +61,13 @@ public class MonsterDataLoader implements CommandLineRunner {
 
             statusRepository.save(new Status(StatusEnum.UPDATING, new Date(), 0L));
 
+            // fetch monster ids and submit a new MonsterDataTask for each
             ArrayList<Future<Monster>> results = fetchMonsterIds().stream()
                     .map(id -> applicationContext.getBean(MonsterDataTask.class, id))
                     .map(task -> taskExecutor.submit(task))
                     .collect(Collectors.toCollection(ArrayList::new));
 
+            // ensure all have completed
             for (Future<Monster> result : results) {
                 try {
                     result.get();
@@ -77,6 +89,11 @@ public class MonsterDataLoader implements CommandLineRunner {
         }
     }
     
+    /**
+     * Parse the monster book for all the available monster ids
+     * 
+     * @return a list of monster ids
+     */
     private ArrayList<Long> fetchMonsterIds() throws IOException {
         logger.info("Loading monster catalogue HTML");
         Document doc = Jsoup.connect(Constants.BASE_URL + Constants.FRAGMENT_MONSTER_BOOK).maxBodySize(0).get();

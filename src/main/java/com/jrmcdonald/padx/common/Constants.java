@@ -2,6 +2,9 @@ package com.jrmcdonald.padx.common;
 
 /**
  * Constants
+ * 
+ * @author Jamie McDonald
+ * @since 0.2
  */
 public final class Constants {
 

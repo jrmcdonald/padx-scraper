@@ -22,7 +22,12 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
- * MonsterServiceThread
+ * Monster Data Task
+ * 
+ * <p>Callable thread to execute the parsing of monster data
+ * 
+ * @author Jamie McDonald
+ * @since 0.2
  */
 @Component
 @Scope("prototype")
@@ -33,15 +38,31 @@ public class MonsterDataTask implements Callable<Monster> {
     @Autowired
     MonsterRepository monsters;
 
+    /**
+     * Property specified number of retries
+     */
     @Value("${connection.retries}")
     private int maxRetries;
 
+    /**
+     * Monster id to fetch
+     */
     private final long id;
 
+    /** 
+     * Constructor
+     * 
+     * @param id the monster id
+     */
     public MonsterDataTask(long id) {
         this.id = id;
     }
 
+    /** 
+     * Call method to fetch and parse the monster HTML for the specified id
+     * 
+     * @return the fetched {@link Monster} object
+     */
     @Override
     public Monster call() {
         Monster monster = null;
@@ -54,6 +75,7 @@ public class MonsterDataTask implements Callable<Monster> {
 
             Document doc = null;
 
+            // Attempt to connect and load the HTML into the doc object
             for (int i = 0; i < maxRetries; i++) {
                 try{
                     doc = Jsoup.connect(Constants.BASE_URL + Constants.FRAGMENT_MONSTER + id).maxBodySize(0).get();
@@ -66,13 +88,16 @@ public class MonsterDataTask implements Callable<Monster> {
                 }                 
             }
 
+            // set basic monster details
             monster.setName(MonsterHelpers.getMonsterNameFromDoc(doc));
             monster.setType(MonsterHelpers.getMonsterTypeFromDoc(doc));
 
+            // filter out undesirable rows
             Elements filteredRows = MonsterHelpers.filterEvolutionTableRows(doc);
             Element sourceRow = MonsterHelpers.findSourceRow(id, filteredRows);
             int rowIndex = filteredRows.indexOf(sourceRow);
 
+            // determine evolutions
             MonsterHelpers.determineEvolutionsForMonster(id, monster, filteredRows, sourceRow, rowIndex);
         } catch (InvalidMonsterException ex) {
             logger.warn("Unable to process data for monster id {}: {}", id, ex);
@@ -80,6 +105,7 @@ public class MonsterDataTask implements Callable<Monster> {
             logger.error("Unable to load data for monster id {}: {}", id, ex);
         }
 
+        // store in the database
         monsters.save(monster);
 
         return monster;

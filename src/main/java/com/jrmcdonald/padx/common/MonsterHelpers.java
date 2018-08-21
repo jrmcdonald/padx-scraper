@@ -11,15 +11,30 @@ import com.jrmcdonald.padx.model.Monster;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+/**
+ * Monster Helpers
+ * 
+ * @author Jamie McDonald
+ * @since 0.2
+ */
 public final class MonsterHelpers {
 
-    private static final Logger logger = LoggerFactory.getLogger(MonsterHelpers.class);
-
+    /**
+     * Should only be used statically
+     */
     private MonsterHelpers() {}
 
+    /**
+     * Determine evolutions for the supplied monster. Updates the supplied {@link Monster} object.
+     * 
+     * @param id the monster id
+     * @param monster the Monster
+     * @param filtereredRows the set of desirable rows
+     * @param sourceRow the row containing the base monster
+     * @param rowIndex the row index of the sourceRow
+     * @throws InvalidMonsterException
+     */
     public static void determineEvolutionsForMonster(long id, Monster monster, Elements filteredRows, Element sourceRow,
         int rowIndex) throws InvalidMonsterException {
         EvolutionType evoType = MonsterHelpers.determineEvolutionType(id, filteredRows, sourceRow, rowIndex);
@@ -45,6 +60,13 @@ public final class MonsterHelpers {
         }
     }
 
+    /**
+     * Generate Ultimate to Ultimate evolution details. Updates the supplied monster.
+     * 
+     * @param monster the monster
+     * @param sourceRow the row containing the base monster 
+     * @throws InvalidMonsterException 
+     */
     private static void determineUltimateToUltimateEvolution(Monster monster, Element sourceRow) throws InvalidMonsterException {
         Evolution evo = new Evolution();
         evo.setUltimate(true);
@@ -58,6 +80,14 @@ public final class MonsterHelpers {
         monster.addEvolution(evo);
     }
 
+
+    /**
+     * Generate Reincarnation evolution details. Updates the supplied monster.
+     * 
+     * @param monster the monster
+     * @param sourceRow the row containing the base monster 
+     * @throws InvalidMonsterException 
+     */
     private static void determineReincarnatedEvolution(Monster monster, Element sourceRow) throws InvalidMonsterException {
         Evolution evo = new Evolution();
         evo.setReincarnation(true);
@@ -71,6 +101,13 @@ public final class MonsterHelpers {
         monster.addEvolution(evo);
     }
 
+    /**
+     * Generate Ultimate evolution details. Updates the supplied monster.
+     * 
+     * @param monster the monster
+     * @param sourceRow the row containing the base monster 
+     * @throws InvalidMonsterException 
+     */
     private static void determineUltimateEvolutions(Monster monster, Elements filteredRows) throws InvalidMonsterException {
         Elements evoRows = filteredRows.stream()
                 .filter(MonsterPredicates.isFinalEvolve())
@@ -90,6 +127,13 @@ public final class MonsterHelpers {
         }
     }
 
+    /**
+     * Generate normal evolution details. Updates the supplied monster.
+     * 
+     * @param monster the monster
+     * @param sourceRow the row containing the base monster 
+     * @throws InvalidMonsterException 
+     */
     private static void determineNormalEvolution(long id, Monster monster, Elements filteredRows, Element sourceRow,
         int rowIndex) throws InvalidMonsterException {
         Evolution evo = new Evolution();
@@ -115,14 +159,32 @@ public final class MonsterHelpers {
         monster.addEvolution(evo);
     }
 
+    /**
+     * Get the evolution element matching the supplied class from the specified row.
+     * 
+     * @param row the element to search
+     * @param className the class name to look for
+     * @return the matching element
+     */
     private static Element getEvolutionCellByClass(Element row, String className) {
         return row.getElementsByClass(className).first();
     }
 
+    /**
+     * Determine the evolution type.
+     * 
+     * @param id the id of the base monster
+     * @param filteredRows the set of desirable rows
+     * @param sourceRow the row containing the base monster
+     * @param rowIndex the index of the row containing the base monster
+     * @return the evolution type
+     * @throws InvalidMonsterException
+     */
     private static EvolutionType determineEvolutionType(long id, Elements filteredRows, Element sourceRow,
         int rowIndex) throws InvalidMonsterException {
     EvolutionType evoType = EvolutionType.NORMAL;
 
+        // if it is row index 0, then it is either a normal, or ultimate evolution
         if (rowIndex == 0) {
             Elements evolveCells = sourceRow.getElementsByClass("evolve");
 
@@ -130,6 +192,7 @@ public final class MonsterHelpers {
 
             int cellIndex = evolveCells.indexOf(sourceCell);
 
+            // if it is the last cell in the row, then it is an ultimate evolution
             if (cellIndex == evolveCells.size() - 1) {
                 evoType = EvolutionType.ULTIMATE;
             }
@@ -148,6 +211,14 @@ public final class MonsterHelpers {
         return evoType;
     }
 
+    /**
+     * Finds the base monster in the supplied cells.
+     * 
+     * @param id the base monster id
+     * @param cells the cells to search
+     * @return the cell containing the base monster
+     * @throws InvalidMonsterException
+     */
     private static Element findSourceCell(long id, Elements cells) throws InvalidMonsterException {
         return cells.stream()
                 .filter(MonsterPredicates.containsMonsterBookId(id))
@@ -155,6 +226,14 @@ public final class MonsterHelpers {
                 .orElseThrow(() -> new InvalidMonsterException("UNABLE_TO_FIND_MONSTER_IN_CELLS"));
     }
 
+    /**
+     * Find the row containing the base monster in the set of filtered rows.
+     * 
+     * @param id the base monster id
+     * @param filteredRows the set of desirable rows
+     * @return the row containing the base monster
+     * @throws InvalidMonsterException
+     */
     public static Element findSourceRow(long id, Elements filteredRows) throws InvalidMonsterException {
         return filteredRows.stream()
                 .filter(MonsterPredicates.containsMonsterBookId(id))
@@ -162,6 +241,13 @@ public final class MonsterHelpers {
                 .orElseThrow(() -> new InvalidMonsterException("MONSTER_NOT_IN_EVO_TABLE"));
     }
 
+    /**
+     * Filter the supplied HTML document to find the desirable rows in the evolution table.
+     * 
+     * @param doc the HTML document
+     * @return a set of filtered rows
+     * @throws InvalidMonsterException if the evolution table is invalid
+     */
     public static Elements filterEvolutionTableRows(Document doc) throws InvalidMonsterException {
         return Optional.ofNullable(doc.getElementById("evolve"))
                 .map(Element::nextElementSibling)
@@ -174,6 +260,13 @@ public final class MonsterHelpers {
                 .collect(Collectors.toCollection(Elements::new));
     }
 
+    /** 
+     * Find the monster name in the supplied HTML document.
+     * 
+     * @param doc the HTML document
+     * @return the monster name
+     * @throws InvalidMonsterException if the document does not contain the name
+     */
     public static String getMonsterNameFromDoc(Document doc) throws InvalidMonsterException {
         return doc.getElementsByTag("span")
                 .stream()
@@ -185,6 +278,13 @@ public final class MonsterHelpers {
                 .orElseThrow(() -> new InvalidMonsterException("INVALID_NAME_TEXT"));
     }
 
+    /** 
+     * Find the monster type in the supplied HTML document.
+     * 
+     * @param doc the HTML document
+     * @return the monster type
+     * @throws InvalidMonsterException if the document does not contain the type
+     */
     public static String getMonsterTypeFromDoc(Document doc) throws InvalidMonsterException {
         return doc.getElementsByClass("ptitle")
                 .stream()
@@ -195,6 +295,13 @@ public final class MonsterHelpers {
                 .orElseThrow(() -> new InvalidMonsterException("INVALID_MONSTER_TYPE"));
     }
 
+    /** 
+     * Find the monster id in the supplied HTML document.
+     * 
+     * @param doc the HTML document
+     * @return the monster id 
+     * @throws InvalidMonsterException if the document does not contain the id
+     */
     private static long findAndParseMonsterId(Element element) throws InvalidMonsterException {
         return element.getElementsByTag("a").stream()
                 .findFirst()
@@ -205,6 +312,12 @@ public final class MonsterHelpers {
                 .orElseThrow(() -> new InvalidMonsterException("UNABLE_TO_PARSE_ID_FROM_HREF"));
     }
 
+    /**
+     * Find evolution materials in the supplied element and add them to the evolution.
+     * 
+     * @param element the element to search
+     * @param evo the evolution to add materials to
+     */
     private static void addMaterialsToEvolution(Element element, Evolution evo) {
         for (Element a : element.getElementsByTag("a")) {
             long materialId = Long.parseLong(a.attr("href").split("=")[1]);
@@ -212,6 +325,12 @@ public final class MonsterHelpers {
         }
     }
 
+    /**
+     * Check if the elements contain an ultimate to ultimate evolution.
+     * 
+     * @param elements the elements to search
+     * @return true or false
+     */
     private static boolean elementsContainUltimateToUltimate(Elements elements) {
         return elements.stream()
                 .filter(MonsterPredicates.isAwokenEvolve())
@@ -219,6 +338,12 @@ public final class MonsterHelpers {
                 .count() > 0;
     }
 
+    /**
+     * Check if the elements contain a reincarnation evolution.
+     * 
+     * @param elements the elements to search
+     * @return true or false
+     */
     private static boolean elementsContainReincarnation(Elements elements) {
         return elements.stream()
                 .filter(MonsterPredicates.isAwokenEvolve())

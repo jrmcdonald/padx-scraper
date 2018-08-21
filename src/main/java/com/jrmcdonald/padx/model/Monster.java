@@ -9,14 +9,34 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+/**
+ * Monster Model
+ * 
+ * @author Jamie McDonald
+ * @since 0.2
+ */
 @Entity
 public class Monster {
 
+    /**
+     * Non auto-generated id field.
+     */
     @Id
     private Long id;
+
+    /**
+     * Monster name
+     */
     private String name;
+
+    /**
+     * Monster type
+     */
     private String type;
     
+    /** 
+     * Set of {@link Evolution} objects
+     */
     @OneToMany(mappedBy = "monster", fetch = FetchType.EAGER, cascade = { CascadeType.ALL }, orphanRemoval = true)
     private Set<Evolution> evolutions = new LinkedHashSet<Evolution>();
 
@@ -77,6 +97,9 @@ public class Monster {
       evolutions.forEach(evo -> evo.setMonster(this));
     }
 
+    /**
+     * Add an {@link Evolution} to the {@link #evolutions} set and associate it with this object
+     */
     public void addEvolution(Evolution evolution) {
       evolutions.add(evolution);
       evolution.setMonster(this);

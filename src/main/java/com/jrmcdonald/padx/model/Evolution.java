@@ -16,24 +16,50 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * Evolution Model
+ * 
+ * @author Jamie McDonald
+ * @since 0.2
+ */
 @Entity
 public class Evolution {
 
+    /**
+     * Auto-generated id field
+     */
     @Id
     @JsonIgnore
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
+    /** 
+     * The evolution target
+     */
     private Long evolution;
+
+    /**
+     * Whether the evolution is an Ultimate evolution or not
+     */
     private boolean ultimate;
+
+    /**
+     * Whether the evolution is a Reincarnation evolution or not
+     */
     private boolean reincarnation;
 
+    /**
+     * A map of evolution materials and counts
+     */
     @ElementCollection(fetch = FetchType.EAGER)
     @MapKeyColumn(name="material_id")
     @Column(name="material_count")
     @CollectionTable(name="evolution_materials", joinColumns=@JoinColumn(name="evolution_id"))
     private Map<Long, AtomicLong> materials = new HashMap<Long, AtomicLong>();
 
+    /**
+     * The {@link Monster} object that this evolution belongs to
+     */
     @JsonIgnore
     @ManyToOne
     private Monster monster;
@@ -109,6 +135,8 @@ public class Evolution {
     }
 
     /**
+     * Add a material to the {@link #materials} map or increment the count if it exists
+     * 
      * @param materialId the material to add or increment
      */
     public void putOrIncrementMaterial(long materialId) {

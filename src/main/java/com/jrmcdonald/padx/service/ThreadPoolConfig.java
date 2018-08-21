@@ -6,7 +6,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
- * MonsterDataTaskExecutor
+ * Thread Pool Configuration
+ * 
+ * @author Jamie McDonald
+ * @since 0.2
  */
 @Configuration
 public class ThreadPoolConfig {
