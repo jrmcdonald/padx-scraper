@@ -334,7 +334,7 @@ public final class MonsterHelpers {
     private static boolean elementsContainUltimateToUltimate(Elements elements) {
         return elements.stream()
                 .filter(MonsterPredicates.isAwokenEvolve())
-                .filter(MonsterPredicates.isUltimateToUltimate())
+                .filter(MonsterPredicates.isUltimateToUltimateEvolve())
                 .count() > 0;
     }
 
@@ -347,7 +347,7 @@ public final class MonsterHelpers {
     private static boolean elementsContainReincarnation(Elements elements) {
         return elements.stream()
                 .filter(MonsterPredicates.isAwokenEvolve())
-                .filter(MonsterPredicates.isReincarnation())
+                .filter(MonsterPredicates.isReincarnationEvolve())
                 .count() > 0;
     }
 }

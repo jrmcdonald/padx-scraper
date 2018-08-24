@@ -1,8 +1,8 @@
 package com.jrmcdonald.padx.common;
 
 import static com.jrmcdonald.padx.common.MonsterPredicates.isAwokenEvolve;
-import static com.jrmcdonald.padx.common.MonsterPredicates.isReincarnation;
-import static com.jrmcdonald.padx.common.MonsterPredicates.isUltimateToUltimate;
+import static com.jrmcdonald.padx.common.MonsterPredicates.isReincarnationEvolve;
+import static com.jrmcdonald.padx.common.MonsterPredicates.isUltimateToUltimateEvolve;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.jsoup.nodes.Element;
@@ -31,7 +31,7 @@ public class MonsterPredicatesTest extends BaseTest {
      * Test the isAwokenEvolve predicate against matching HTML.
      */
     @Test
-    public void testIsAwokenEvolve() {
+    public void givenMatchingHTML_isAwokenEvolve_thenReturnTrue() {
         Element td = new Element("td");
         td.html(getResourceAsString(AWOKEN_EVOLVE_HTML));
 
@@ -40,50 +40,50 @@ public class MonsterPredicatesTest extends BaseTest {
     }
 
     /**
-     * Test the isUltimateToUltimate predicate against matching HTML.
+     * Test the isUltimateToUltimateEvolve predicate against matching HTML.
      */
     @Test
-    public void testIsUltimateToUltimateEvolve() {
+    public void givenMatchingHTML_isUltimateToUltimateEvolve_thenReturnTrue() {
         Element td = new Element("td");
         td.html(getResourceAsString(AWOKEN_EVOLVE_HTML));
 
-        boolean result = isUltimateToUltimate().test(td);
+        boolean result = isUltimateToUltimateEvolve().test(td);
         assertThat(result).isTrue();
     }
     
     /**
-     * Test the isUltimateToUltimate predicate against non matching HTML.
+     * Test the isUltimateToUltimateEvolve predicate against non matching HTML.
      */
     @Test
-    public void testIsNotUltimateToUltimateEvolve() {
+    public void givenMatchingHTML_isUltimateToUltimateEvolve_thenReturnFalse() {
         Element td = new Element("td");
         td.html(getResourceAsString(REINCARNATED_EVOLVE_HTML));
 
-        boolean result = isUltimateToUltimate().test(td);
+        boolean result = isUltimateToUltimateEvolve().test(td);
         assertThat(result).isFalse();
     }
 
     /**
-     * Test the isReincarnation predicate against matching HTML.
+     * Test the isReincarnationEvolve predicate against matching HTML.
      */
     @Test
-    public void testIsReincarnationEvolve() {
+    public void givenMatchingHTML_isReincarnationEvolve_thenReturnTrue() {
         Element td = new Element("td");
         td.html(getResourceAsString(REINCARNATED_EVOLVE_HTML));
 
-        boolean result = isReincarnation().test(td);
+        boolean result = isReincarnationEvolve().test(td);
         assertThat(result).isTrue();
     }
 
     /**
-     * Test the isReincarnation predicate against non matching HTML.
+     * Test the isReincarnationEvolve predicate against non matching HTML.
      */
     @Test
-    public void testIsNotReincarnationEvolve() {
+    public void givenMatchingHTML_isReincarnationEvolve_thenReturnFalse() {
         Element td = new Element("td");
         td.html(getResourceAsString(AWOKEN_EVOLVE_HTML));
 
-        boolean result = isReincarnation().test(td);
+        boolean result = isReincarnationEvolve().test(td);
         assertThat(result).isFalse();
     }
 }

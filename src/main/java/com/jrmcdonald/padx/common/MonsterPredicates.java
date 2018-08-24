@@ -39,14 +39,14 @@ public final class MonsterPredicates {
     /**
      * Determine if the element contains an ultimate to ultimate evolution
      */
-    public static Predicate<Element> isUltimateToUltimate() {
+    public static Predicate<Element> isUltimateToUltimateEvolve() {
         return e -> e.getElementsByClass("awokenevolve").first().getElementsByAttributeValueContaining("alt", "Reincarnated").isEmpty();
     }
 
     /** 
      * Determine if the element contains a reincarnation evolution
      */
-    public static Predicate<Element> isReincarnation() {
+    public static Predicate<Element> isReincarnationEvolve() {
         return e -> !(e.getElementsByClass("awokenevolve").first().getElementsByAttributeValueContaining("alt", "Reincarnated").isEmpty());
     }
     
