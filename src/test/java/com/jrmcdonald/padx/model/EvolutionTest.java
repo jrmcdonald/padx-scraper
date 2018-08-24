@@ -3,8 +3,6 @@ package com.jrmcdonald.padx.model;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * Evolution Test

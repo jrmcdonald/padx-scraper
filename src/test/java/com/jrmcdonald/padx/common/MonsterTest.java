@@ -15,7 +15,6 @@ import com.jrmcdonald.padx.model.Evolution;
 import com.jrmcdonald.padx.model.Monster;
 
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 /**
