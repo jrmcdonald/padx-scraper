@@ -29,7 +29,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 /**
- * MonsterControllerTest
+ * Monster Controller Test
+ * 
+ * @author Jamie McDonald
+ * @since 0.2
  */
 @RunWith(SpringRunner.class)
 @WebMvcTest(MonsterController.class)
@@ -41,8 +44,14 @@ public class MonsterControllerTest extends MonsterTest {
     @MockBean
     private MonsterRepository monsterRepository;
 
+    /**
+     * List of all possible monster objects for these tests.
+     */
     private List<Monster> allMonsters = new ArrayList<Monster>();
 
+    /** 
+     * Set up some initial test data.
+     */
     @Before
     public void init() {
         Monster monster = new Monster();
@@ -78,6 +87,9 @@ public class MonsterControllerTest extends MonsterTest {
         allMonsters.add(monster2);
     }
 
+    /**
+     * Test that the /api/monsters endpoint correctly returns all monsters.
+     */
     @Test
     public void givenMonsters_whenGetMonsters_thenReturnJsonArray() throws Exception {
 
@@ -92,6 +104,9 @@ public class MonsterControllerTest extends MonsterTest {
         assertThat(mapper.writeValueAsString(allMonsters)).isEqualTo(result.getResponse().getContentAsString());
     }
 
+    /**
+     * Test that the /api/monsters/238 endpoint returns the correct monster.
+     */
     @Test
     public void givenMonsters_whenGetMonsterById_thenReturnJson() throws Exception {
 
@@ -106,6 +121,9 @@ public class MonsterControllerTest extends MonsterTest {
         assertThat(mapper.writeValueAsString(allMonsters.get(0))).isEqualTo(result.getResponse().getContentAsString());
     }
 
+    /**
+     * Test that the /api/monsters/239 endpoint returns a 404 not found.
+     */
     @Test
     public void givenMonsters_whenGetInvalidMonsterById_thenReturnError() throws Exception {
 

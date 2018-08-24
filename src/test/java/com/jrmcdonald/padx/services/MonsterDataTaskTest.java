@@ -22,7 +22,10 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
- * MonsterDataTaskTest
+ * Monster Data Task Test
+ * 
+ * @author Jamie McDonald
+ * @since 0.2
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -38,7 +41,7 @@ public class MonsterDataTaskTest extends MonsterTest {
     private MonsterRepository monsterRepository;
 
     @Test
-    public void testLoadNormalEvolution() {
+    public void givenMonsterId238_whenSubmitTask_returnsMonsterWithNormalEvolutions() {
         long id = 238L;
 
         Monster monster = new Monster();
@@ -59,7 +62,7 @@ public class MonsterDataTaskTest extends MonsterTest {
     }
 
     @Test
-    public void testLoadUltimateEvolution() {
+    public void givenMonsterId239_whenSubmitTask_returnsMonsterWithUltimateEvolutions() {
         long id = 239L;
 
         Monster monster = new Monster();
@@ -101,7 +104,7 @@ public class MonsterDataTaskTest extends MonsterTest {
     }
 
     @Test
-    public void testLoadReincarnatedEvolution() {
+    public void givenMonsterId1955_whenSubmitTask_returnsMonsterWithReincarnationEvolutions() {
         long id = 1955L;
 
         Monster monster = new Monster();
@@ -123,7 +126,7 @@ public class MonsterDataTaskTest extends MonsterTest {
     }
 
     @Test
-    public void testLoadNoEvolution() {
+    public void givenMonsterId1115_whenSubmitTask_returnsMonsterWithNoEvolutions() {
         long id = 1115L;
 
         Monster monster = new Monster();
@@ -135,7 +138,7 @@ public class MonsterDataTaskTest extends MonsterTest {
     }
 
     @Test
-    public void testLoadFinalEvolution_FixIssue4() {
+    public void givenMonsterId995_whenSubmitTask_returnsMonsterWithUltimateEvolutions() {
         long id = 995L;
 
         Monster monster = new Monster();
@@ -156,6 +159,9 @@ public class MonsterDataTaskTest extends MonsterTest {
         genericTest(id, monster);
     }
 
+    /**
+     * Generic test method to fetch the monster id and compare the result.
+     */
 	private void genericTest(long id, Monster monster) {
         Monster fetchedMonster = callMonsterDataTask(id);
 
@@ -163,9 +169,12 @@ public class MonsterDataTaskTest extends MonsterTest {
 
         Optional<Monster> foundMonster = monsterRepository.findById(id);
         assertThat(foundMonster).isPresent();
-        // assertThatMonstersAreEqual(monster, foundMonster.get());
+        assertThatMonstersAreEqual(monster, foundMonster.get());
 	}
 
+    /**
+     * Submit the threaded MonsterDataTask.
+     */
 	private Monster callMonsterDataTask(long id) {
 		MonsterDataTask task = applicationContext.getBean(MonsterDataTask.class, id);
         Future<Monster> result = testTaskExecutor.submit(task);

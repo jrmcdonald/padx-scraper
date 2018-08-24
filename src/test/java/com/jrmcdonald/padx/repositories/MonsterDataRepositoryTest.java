@@ -15,7 +15,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
- * MonsterDataRepiositoryTest
+ * Monster Data Repository Test
+ * 
+ * @author Jamie McDonald
+ * @since 0.2
  */
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -24,8 +27,11 @@ public class MonsterDataRepositoryTest extends MonsterTest {
     @Autowired
     private MonsterRepository monsterRepository;
 
+    /**
+     * Test that when a monster is persisted, it can be found again. 
+     */
     @Test
-    public void testPersistAndFindMonsterById() {
+    public void givenMonsterId_whenFindById_thenReturnsMonster() {
         Monster monster = new Monster();
         monster.setId(1L);
         monster.setName("Tyra");
