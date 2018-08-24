@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Optional;
 
 import com.jrmcdonald.padx.common.MonsterTest;
-import com.jrmcdonald.padx.model.Evolution;
 import com.jrmcdonald.padx.model.Monster;
 
 import org.junit.Test;
@@ -32,20 +31,7 @@ public class MonsterDataRepositoryTest extends MonsterTest {
      */
     @Test
     public void givenMonsterId_whenFindById_thenReturnsMonster() {
-        Monster monster = new Monster();
-        monster.setId(1L);
-        monster.setName("Tyra");
-        monster.setType("Dragon");
-
-        Evolution evolution = new Evolution();
-        evolution.setEvolution(2L);
-        evolution.putOrIncrementMaterial(152L);
-        evolution.putOrIncrementMaterial(152L);
-
-        // check that putOrIncrementMaterial increments correctly
-        assertThat(evolution.getMaterials().get(152L).longValue()).isEqualTo(2L);
-
-        monster.addEvolution(evolution);
+        Monster monster = loadMonsterById(1L);
 
         // persist the monster
         monsterRepository.save(monster);

@@ -14,6 +14,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jrmcdonald.padx.model.Evolution;
 import com.jrmcdonald.padx.model.Monster;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+
 /**
  * Monster Test
  * 
@@ -23,6 +27,24 @@ import com.jrmcdonald.padx.model.Monster;
  * @since 0.2
  */
 public class MonsterTest extends BaseTest {
+
+    public Monster loadMonsterById(long id) {
+        return getResourceAsMonster(new ClassPathResource("monsters/" + id + ".json"));
+    }
+
+    public Monster getResourceAsMonster(Resource resource) {
+        Monster monster = null;
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            monster = mapper.readValue(getResourceAsString(resource), Monster.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail("An exception occurred reading a resource: " + resource.toString());
+        }
+
+        return monster;
+    }
 
     /**
      * Assert that two monster objects are equal.

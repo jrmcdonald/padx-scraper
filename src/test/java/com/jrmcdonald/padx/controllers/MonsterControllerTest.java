@@ -1,16 +1,15 @@
 package com.jrmcdonald.padx.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jrmcdonald.padx.common.MonsterTest;
 import com.jrmcdonald.padx.model.Evolution;
@@ -54,37 +53,8 @@ public class MonsterControllerTest extends MonsterTest {
      */
     @Before
     public void init() {
-        Monster monster = new Monster();
-        monster.setId(238L);
-        monster.setType("God");
-        monster.setName("Lakshmi");
-        
-        Evolution evolution = new Evolution();
-        evolution.setEvolution(239L);
-        evolution.putOrIncrementMaterial(234L);
-        evolution.putOrIncrementMaterial(234L);
-        evolution.putOrIncrementMaterial(172L);
-        evolution.putOrIncrementMaterial(148L);
-        evolution.putOrIncrementMaterial(160L);
-        monster.addEvolution(evolution);
-
-        Monster monster2 = new Monster();
-        monster2.setId(1955L);
-        monster2.setType("Physical / God");
-        monster2.setName("Awoken Lakshmi");
-        
-        Evolution evolution2 = new Evolution();
-        evolution2.setEvolution(3242L);
-        evolution2.setReincarnation(true);
-        evolution2.putOrIncrementMaterial(162L);
-        evolution2.putOrIncrementMaterial(162L);
-        evolution2.putOrIncrementMaterial(162L);
-        evolution2.putOrIncrementMaterial(162L);
-        evolution2.putOrIncrementMaterial(162L);
-        monster2.addEvolution(evolution);
-
-        allMonsters.add(monster);
-        allMonsters.add(monster2);
+        allMonsters.add(loadMonsterById(238L));
+        allMonsters.add(loadMonsterById(1955L));
     }
 
     /**
