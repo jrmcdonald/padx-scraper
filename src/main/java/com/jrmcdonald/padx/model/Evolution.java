@@ -39,16 +39,6 @@ public class Evolution {
     private Long evolution;
 
     /**
-     * Whether the evolution is an Ultimate evolution or not
-     */
-    private boolean ultimate;
-
-    /**
-     * Whether the evolution is a Reincarnation evolution or not
-     */
-    private boolean reincarnation;
-
-    /**
      * A map of evolution materials and counts
      */
     @ElementCollection(fetch = FetchType.EAGER)
@@ -93,34 +83,6 @@ public class Evolution {
     }
 
     /**
-     * @return the ultimate
-     */
-    public boolean isUltimate() {
-      return ultimate;
-    }
-
-    /**
-     * @param ultimate the ultimate to set
-     */
-    public void setUltimate(boolean ultimate) {
-      this.ultimate = ultimate;
-    }
-
-    /**
-     * @return the reincarnation
-     */
-    public boolean isReincarnation() {
-      return reincarnation;
-    }
-
-    /**
-     * @param reincarnation the reincarnation to set
-     */
-    public void setReincarnation(boolean reincarnation) {
-      this.reincarnation = reincarnation;
-    }
-
-    /**
      * @return the materials
      */
     public Map<Long, AtomicLong> getMaterials() {
@@ -161,8 +123,8 @@ public class Evolution {
     @Override
     public String toString() {
         return String.format(
-                "Evolution[evolution=%d, ultimate='%s', reincarnation='%s' materials='%s']",
-                evolution, ultimate, reincarnation, materials);
+                "Evolution[evolution=%d, materials='%s']",
+                evolution, materials);
     }
 
 }

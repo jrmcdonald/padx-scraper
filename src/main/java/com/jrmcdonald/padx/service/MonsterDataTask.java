@@ -5,6 +5,7 @@ import java.net.SocketTimeoutException;
 import java.util.concurrent.Callable;
 
 import com.jrmcdonald.padx.common.Constants;
+import com.jrmcdonald.padx.common.EvolutionHelpers;
 import com.jrmcdonald.padx.common.MonsterHelpers;
 import com.jrmcdonald.padx.exceptions.InvalidMonsterException;
 import com.jrmcdonald.padx.model.Monster;
@@ -12,8 +13,6 @@ import com.jrmcdonald.padx.repositories.MonsterRepository;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,12 +72,12 @@ public class MonsterDataTask implements Callable<Monster> {
             monster = new Monster();
             monster.setId(id);
 
-            Document doc = null;
+            Document padxHTML = null;
 
             // Attempt to connect and load the HTML into the doc object
             for (int i = 0; i < maxRetries; i++) {
                 try{
-                    doc = Jsoup.connect(Constants.BASE_URL + Constants.FRAGMENT_MONSTER + id).maxBodySize(0).get();
+                    padxHTML = Jsoup.connect(Constants.PADX_BASE_URL + Constants.PADX_FRAGMENT_MONSTER + id).maxBodySize(0).get();
                     break; 
                 }
                 catch (SocketTimeoutException e){
@@ -88,17 +87,27 @@ public class MonsterDataTask implements Callable<Monster> {
                 }                 
             }
 
-            // set basic monster details
-            monster.setName(MonsterHelpers.getMonsterNameFromDoc(doc));
-            monster.setType(MonsterHelpers.getMonsterTypeFromDoc(doc));
+            Document skyHTML = null;
 
-            // filter out undesirable rows
-            Elements filteredRows = MonsterHelpers.filterEvolutionTableRows(doc);
-            Element sourceRow = MonsterHelpers.findSourceRow(id, filteredRows);
-            int rowIndex = filteredRows.indexOf(sourceRow);
+            // Attempt to connect and load the HTML into the doc object
+            for (int i = 0; i < maxRetries; i++) {
+                try{
+                    skyHTML = Jsoup.connect(Constants.SKY_BASE_URL + Constants.SKY_FRAGMENT_MONSTER + id).maxBodySize(0).get();
+                    break; 
+                }
+                catch (SocketTimeoutException e){
+                    if (i == maxRetries - 1) {
+                        throw e;
+                    }
+                }                 
+            }
+            
+            // set basic monster details
+            monster.setName(MonsterHelpers.getMonsterNameFromDoc(padxHTML));
+            monster.setType(MonsterHelpers.getMonsterTypeFromDoc(padxHTML));
 
             // determine evolutions
-            MonsterHelpers.determineEvolutionsForMonster(id, monster, filteredRows, sourceRow, rowIndex);
+            EvolutionHelpers.determineEvolutionsForMonster(monster, skyHTML);
         } catch (InvalidMonsterException ex) {
             logger.warn("Unable to process data for monster id {}: {}", id, ex);
         } catch (IOException ex) {
