@@ -1,0 +1,29 @@
+stages:
+  - maven
+  - name: docker-test
+    if: branch = development
+  - name: docker-deploy
+    if: branch = master
+jobs:
+  include:
+    - stage: maven
+      language: java
+      script:
+        - mvn clean test package
+    - stage: docker-test 
+      sudo: required
+      services:
+        - docker
+      script:
+        - mvn dockerfile:build
+    - stage: docker-deploy
+      sudo: required
+      services:
+        - docker
+      script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - mvn dockerfile:build
+        - mvn dockerfile:tag@tag-version
+        - mvn dockerfile:push@push-version
+        - mvn dockerfile:push@push-latest
+      
