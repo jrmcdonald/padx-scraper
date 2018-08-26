@@ -16,11 +16,4 @@ public final class Constants {
     public static final String SKY_BASE_URL = "http://pad.skyozora.com/";
     public static final String SKY_FRAGMENT_MONSTER = "pets/";
 
-    public static enum EvolutionType {
-        NORMAL,
-        ULTIMATE,
-        ULTIMATE_TO_ULTIMATE,
-        REINCARNATION,
-        FINAL
-    } 
 }
