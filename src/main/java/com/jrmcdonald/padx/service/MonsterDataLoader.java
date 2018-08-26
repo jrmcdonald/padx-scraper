@@ -96,7 +96,7 @@ public class MonsterDataLoader implements CommandLineRunner {
      */
     private ArrayList<Long> fetchMonsterIds() throws IOException {
         logger.info("Loading monster catalogue HTML");
-        Document doc = Jsoup.connect(Constants.BASE_URL + Constants.FRAGMENT_MONSTER_BOOK).maxBodySize(0).get();
+        Document doc = Jsoup.connect(Constants.PADX_BASE_URL + Constants.PADX_FRAGMENT_MONSTER_BOOK).maxBodySize(0).get();
 
         logger.info("Parsing HTML for monster links");
         Elements monsterLinks = doc.select("div.indexframe > a[href^='monster.asp?n=']");

@@ -80,6 +80,22 @@ public class MonsterDataTaskTest extends MonsterTest {
     }
 
     /**
+     * Test that downwards ultimate evolutions are loaded properly. Fixes issue #15.
+     */
+    @Test
+    public void givenMonsterId2969_whenSubmitTask_returnsMonsterWithUltimateEvolutions() {
+        genericTest(2969L);
+    }
+
+    /**
+     * Test that a monster with no evolution table loads properly.
+     */
+    @Test
+    public void givenMonsterId150_whenSubmitTask_returnsMonsterWithNoEvolutions() {
+        genericTest(150L);
+    }
+
+    /**
      * Generic test method to fetch the monster id and compare the result.
      * 
      * @param id the id to fetch
