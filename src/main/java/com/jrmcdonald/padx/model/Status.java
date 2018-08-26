@@ -45,6 +45,11 @@ public class Status {
     private long count;
 
     /**
+     * No arg constructor for hibernate.
+     */
+    public Status() {}
+
+    /**
      * Constructor
      * 
      * @param status the {@link StatusEnum} to set
