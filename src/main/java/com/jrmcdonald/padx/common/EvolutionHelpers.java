@@ -38,11 +38,15 @@ public final class EvolutionHelpers {
             Element evoTable = getEvolutionList(doc);
             Element sourceLi = getSourceListItem(evoTable, id);
 
+            // System.out.println(sourceLi.outerHtml());
+
             Element evoList = sourceLi.getElementsByTag("ul").first();
 
             if (evoList != null) {
                 for (Element evoListItem : evoList.children()) {
                     Evolution evo = new Evolution();
+
+                    // System.out.println(evoList.outerHtml());
 
                     Elements evoLinks = getEvolutionLinksFromListItem(evoListItem);
                     
@@ -81,7 +85,7 @@ public final class EvolutionHelpers {
      * @throws InvalidMonsterException
      */
     private static Element getSourceListItem(Element evoTable, long id) throws InvalidMonsterException {
-        return evoTable.getElementsByAttributeValueEnding("href", Long.toString(id)).stream()
+        return evoTable.getElementsByAttributeValueEnding("href", Constants.SKY_FRAGMENT_MONSTER + Long.toString(id)).stream()
                 .findFirst()
                 .map(Element::parent)
                 .orElseThrow(() -> new InvalidMonsterException("MONSTER_NOT_IN_EVO_TABLE"));
