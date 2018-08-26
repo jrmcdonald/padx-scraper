@@ -8,20 +8,59 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jrmcdonald.padx.model.Evolution;
 import com.jrmcdonald.padx.model.Monster;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+
 /**
- * MonsterTest
+ * Monster Test
+ * 
+ * <p>Defines helper methods for testing {@link Monster} objects.
+ * 
+ * @author Jamie McDonald
+ * @since 0.2
  */
 public class MonsterTest extends BaseTest {
 
+    public Monster loadMonsterById(long id) {
+        return getResourceAsMonster(new ClassPathResource("monsters/" + id + ".json"));
+    }
+
+    public Monster getResourceAsMonster(Resource resource) {
+        Monster monster = null;
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            monster = mapper.readValue(getResourceAsString(resource), Monster.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail("An exception occurred reading a resource: " + resource.toString());
+        }
+
+        return monster;
+    }
+
+    /**
+     * Assert that two monster objects are equal.
+     * 
+     * @param source monster object
+     * @param comparator monster object
+     */
     public void assertThatMonstersAreEqual(Monster source, Monster comparator) {
         compare(source, comparator);
     }
 
+    /**
+     * Assert that a provided monster object compares to a json string representation.
+     * 
+     * @param source monster object
+     * @param comparator string
+     */
     public void assertThatMonstersAreEqual(Monster source, String comparator) {
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -32,18 +71,25 @@ public class MonsterTest extends BaseTest {
         }
     }
 
+    /**
+     * Perform a deep comparison of two monster objects.
+     * 
+     * @param source monster object
+     * @param comparator monster object
+     */
     private void compare(Monster source, Monster comparator) {
         assertThat(source).isEqualToIgnoringGivenFields(comparator, "evolutions");
 
         List<Evolution> sourceEvolutions = new ArrayList<Evolution>(source.getEvolutions());
-        List<Evolution> comparatorEvolutions = new ArrayList<Evolution>(comparator.getEvolutions());
+        Map<Long, Evolution> comparatorEvolutions = comparator.getEvolutions().stream()
+                .collect(Collectors.toMap(Evolution::getEvolution, e -> e));
 
         assertThat(sourceEvolutions.size()).isEqualTo(comparatorEvolutions.size());
 
-        for (int i = 0; i < sourceEvolutions.size(); i++) {
-            Evolution sourceEvo = sourceEvolutions.get(i);
-            Evolution comparatorEvo = comparatorEvolutions.get(i);
+        for (Evolution sourceEvo : sourceEvolutions) {
+            Evolution comparatorEvo = comparatorEvolutions.get(sourceEvo.getEvolution());
 
+            assertThat(comparatorEvo).isNotNull();
             assertThat(sourceEvo).isEqualToIgnoringGivenFields(comparatorEvo, "id", "monster", "materials");
 
             Map<Long, AtomicLong> sourceMaterials = sourceEvo.getMaterials();
@@ -55,6 +101,6 @@ public class MonsterTest extends BaseTest {
                 assertThat(comparatorMaterials.containsKey(id)).isTrue();
                 assertThat(comparatorMaterials.get(id).get()).isEqualTo(sourceMaterials.get(id).get());
             }
-        }
+        };
     }
 }

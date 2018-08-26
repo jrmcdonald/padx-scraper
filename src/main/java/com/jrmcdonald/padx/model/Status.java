@@ -12,25 +12,50 @@ import javax.persistence.TemporalType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
- * Status
+ * Status Model
+ * 
+ * @author Jamie McDonald
+ * @since 0.2
  */
 @Entity
 public class Status {
 
+    /**
+     * Auto-generated id field
+     */
     @Id
     @JsonIgnore
     @GeneratedValue(strategy=GenerationType.AUTO)
     private long id;
 
+    /**
+     * {@link StatusEnum} value
+     */
     private StatusEnum status;
 
+    /**
+     * Updated timestamp
+     */
     @Temporal(TemporalType.TIMESTAMP)
     private Date timestamp;
 
+    /** 
+     * Count of records available
+     */
     private long count;
 
+    /**
+     * No arg constructor for hibernate.
+     */
     public Status() {}
 
+    /**
+     * Constructor
+     * 
+     * @param status the {@link StatusEnum} to set
+     * @param timestamp the {@link Date} to set
+     * @param count the count to set
+     */
     public Status(StatusEnum status, Date timestamp, long count) {
         this.status = status;
         this.timestamp = timestamp;
@@ -93,6 +118,9 @@ public class Status {
         this.count = count;
     }
 
+    /**
+     * Status enumeration
+     */
     public enum StatusEnum {
         READY,
         UPDATING,

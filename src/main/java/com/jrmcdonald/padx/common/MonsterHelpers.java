@@ -1,179 +1,30 @@
 package com.jrmcdonald.padx.common;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import com.jrmcdonald.padx.common.Constants.EvolutionType;
 import com.jrmcdonald.padx.exceptions.InvalidMonsterException;
-import com.jrmcdonald.padx.model.Evolution;
-import com.jrmcdonald.padx.model.Monster;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+/**
+ * Monster Helpers
+ * 
+ * @author Jamie McDonald
+ * @since 0.2
+ */
 public final class MonsterHelpers {
 
-    private static final Logger logger = LoggerFactory.getLogger(MonsterHelpers.class);
-
+    /**
+     * Should only be used statically
+     */
     private MonsterHelpers() {}
 
-    public static void determineEvolutionsForMonster(long id, Monster monster, Elements filteredRows, Element sourceRow,
-        int rowIndex) throws InvalidMonsterException {
-        EvolutionType evoType = MonsterHelpers.determineEvolutionType(id, filteredRows, sourceRow, rowIndex);
-
-        switch (evoType) {
-            case NORMAL:
-                determineNormalEvolution(id, monster, filteredRows, sourceRow, rowIndex);
-                break;
-            case ULTIMATE:
-                determineUltimateEvolutions(monster, filteredRows);
-                break;
-            case REINCARNATION:
-                determineReincarnatedEvolution(monster, sourceRow);
-                break;
-            case ULTIMATE_TO_ULTIMATE:
-                determineUltimateToUltimateEvolution(monster, sourceRow);
-                break;
-            case FINAL:
-                // no evolutions
-            default:
-                // no evolutions
-                break;
-        }
-    }
-
-    private static void determineUltimateToUltimateEvolution(Monster monster, Element sourceRow) throws InvalidMonsterException {
-        Evolution evo = new Evolution();
-        evo.setUltimate(true);
-
-        Element evolutionCell = getEvolutionCellByClass(sourceRow, "awokenevolve");
-        evo.setEvolution(findAndParseMonsterId(evolutionCell));
-
-        Element materialsCell = evolutionCell.nextElementSibling();
-        addMaterialsToEvolution(materialsCell, evo);
-
-        monster.addEvolution(evo);
-    }
-
-    private static void determineReincarnatedEvolution(Monster monster, Element sourceRow) throws InvalidMonsterException {
-        Evolution evo = new Evolution();
-        evo.setReincarnation(true);
-
-        Element evolutionCell = getEvolutionCellByClass(sourceRow, "awokenevolve");
-        evo.setEvolution(findAndParseMonsterId(evolutionCell));
-
-        Element materialsCell = evolutionCell.nextElementSibling();
-        addMaterialsToEvolution(materialsCell, evo);
-
-        monster.addEvolution(evo);
-    }
-
-    private static void determineUltimateEvolutions(Monster monster, Elements filteredRows) throws InvalidMonsterException {
-        Elements evoRows = filteredRows.stream()
-                .filter(MonsterPredicates.isFinalEvolve())
-                .collect(Collectors.toCollection(Elements::new));
-        
-        for (Element row : evoRows) {
-            Evolution evo = new Evolution();
-            evo.setUltimate(true);
-
-            Element evolutionCell = getEvolutionCellByClass(row, "evolve");
-            evo.setEvolution(findAndParseMonsterId(evolutionCell)); 
-            
-            Element materialsCell = evolutionCell.previousElementSibling();
-            addMaterialsToEvolution(materialsCell, evo);
-
-            monster.addEvolution(evo);
-        }
-    }
-
-    private static void determineNormalEvolution(long id, Monster monster, Elements filteredRows, Element sourceRow,
-        int rowIndex) throws InvalidMonsterException {
-        Evolution evo = new Evolution();
-        
-        Elements evolveCells = sourceRow.getElementsByClass("evolve");
-
-        Integer sourceCellIndex = evolveCells.stream()
-                .filter(MonsterPredicates.containsMonsterBookId(id))
-                .findFirst()
-                .map(e -> evolveCells.indexOf(e))
-                .orElse(null);
-
-        Element evolutionCell = evolveCells.get(sourceCellIndex + 1);
-
-        evo.setEvolution(findAndParseMonsterId(evolutionCell)); 
-
-        Element evoMatsRow = filteredRows.get(rowIndex + 1);
-
-        Element evoMatsCell = evoMatsRow.children().get(sourceCellIndex);
-
-        addMaterialsToEvolution(evoMatsCell, evo);
-
-        monster.addEvolution(evo);
-    }
-
-    private static Element getEvolutionCellByClass(Element row, String className) {
-        return row.getElementsByClass(className).first();
-    }
-
-    private static EvolutionType determineEvolutionType(long id, Elements filteredRows, Element sourceRow,
-        int rowIndex) throws InvalidMonsterException {
-    EvolutionType evoType = EvolutionType.NORMAL;
-
-        if (rowIndex == 0) {
-            Elements evolveCells = sourceRow.getElementsByClass("evolve");
-
-            Element sourceCell = findSourceCell(id, evolveCells);
-
-            int cellIndex = evolveCells.indexOf(sourceCell);
-
-            if (cellIndex == evolveCells.size() - 1) {
-                evoType = EvolutionType.ULTIMATE;
-            }
-        } else {
-            Elements evolveCells = sourceRow.children();
-
-            if (elementsContainReincarnation(evolveCells)) {
-                evoType = EvolutionType.REINCARNATION;
-            } else if (elementsContainUltimateToUltimate(evolveCells)) {
-                evoType = EvolutionType.ULTIMATE_TO_ULTIMATE;
-            } else {
-                evoType = EvolutionType.FINAL;
-            }
-        }
-
-        return evoType;
-    }
-
-    private static Element findSourceCell(long id, Elements cells) throws InvalidMonsterException {
-        return cells.stream()
-                .filter(MonsterPredicates.containsMonsterBookId(id))
-                .findFirst()
-                .orElseThrow(() -> new InvalidMonsterException("UNABLE_TO_FIND_MONSTER_IN_CELLS"));
-    }
-
-    public static Element findSourceRow(long id, Elements filteredRows) throws InvalidMonsterException {
-        return filteredRows.stream()
-                .filter(MonsterPredicates.containsMonsterBookId(id))
-                .findFirst()
-                .orElseThrow(() -> new InvalidMonsterException("MONSTER_NOT_IN_EVO_TABLE"));
-    }
-
-    public static Elements filterEvolutionTableRows(Document doc) throws InvalidMonsterException {
-        return Optional.ofNullable(doc.getElementById("evolve"))
-                .map(Element::nextElementSibling)
-                .map(e -> e.getElementById("tablestat"))
-                .map(e -> e.child(0))
-                .map(Element::children)
-                .orElseThrow(() -> new InvalidMonsterException("INVALID_EVOLUTION_TABLE"))
-                .stream()
-                .filter(MonsterPredicates.isDesirableEvolutionChartRow())
-                .collect(Collectors.toCollection(Elements::new));
-    }
-
+    /** 
+     * Find the monster name in the supplied HTML document.
+     * 
+     * @param doc the HTML document
+     * @return the monster name
+     * @throws InvalidMonsterException if the document does not contain the name
+     */
     public static String getMonsterNameFromDoc(Document doc) throws InvalidMonsterException {
         return doc.getElementsByTag("span")
                 .stream()
@@ -185,6 +36,13 @@ public final class MonsterHelpers {
                 .orElseThrow(() -> new InvalidMonsterException("INVALID_NAME_TEXT"));
     }
 
+    /** 
+     * Find the monster type in the supplied HTML document.
+     * 
+     * @param doc the HTML document
+     * @return the monster type
+     * @throws InvalidMonsterException if the document does not contain the type
+     */
     public static String getMonsterTypeFromDoc(Document doc) throws InvalidMonsterException {
         return doc.getElementsByClass("ptitle")
                 .stream()
@@ -193,36 +51,5 @@ public final class MonsterHelpers {
                 .map(Element::nextElementSibling)
                 .map(Element::text)
                 .orElseThrow(() -> new InvalidMonsterException("INVALID_MONSTER_TYPE"));
-    }
-
-    private static long findAndParseMonsterId(Element element) throws InvalidMonsterException {
-        return element.getElementsByTag("a").stream()
-                .findFirst()
-                .map(a -> a.attr("href"))
-                .map(s -> s.split("="))
-                .map(a -> a[1])
-                .map(Long::parseLong)
-                .orElseThrow(() -> new InvalidMonsterException("UNABLE_TO_PARSE_ID_FROM_HREF"));
-    }
-
-    private static void addMaterialsToEvolution(Element element, Evolution evo) {
-        for (Element a : element.getElementsByTag("a")) {
-            long materialId = Long.parseLong(a.attr("href").split("=")[1]);
-            evo.putOrIncrementMaterial(materialId);
-        }
-    }
-
-    private static boolean elementsContainUltimateToUltimate(Elements elements) {
-        return elements.stream()
-                .filter(MonsterPredicates.isAwokenEvolve())
-                .filter(MonsterPredicates.isUltimateToUltimate())
-                .count() > 0;
-    }
-
-    private static boolean elementsContainReincarnation(Elements elements) {
-        return elements.stream()
-                .filter(MonsterPredicates.isAwokenEvolve())
-                .filter(MonsterPredicates.isReincarnation())
-                .count() > 0;
     }
 }

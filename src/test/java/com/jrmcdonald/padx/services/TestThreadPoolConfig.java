@@ -5,11 +5,17 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
- * ThreadPoolConfig
+ * Test Thread Pool Config
+ * 
+ * @author Jamie McDonald
+ * @since 0.2
  */
 @Configuration
 public class TestThreadPoolConfig {
 
+    /**
+     * Bean to configure a thread pool task executor for tests.
+     */
     @Bean
     public ThreadPoolTaskExecutor testTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();

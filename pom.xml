@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.jrmcdonald</groupId>
     <artifactId>padx-scraper</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
 
     <properties>
       <java.version>1.8</java.version>
@@ -14,7 +14,7 @@
     <parent>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-parent</artifactId>
-      <version>2.0.2.RELEASE</version>
+      <version>2.0.4.RELEASE</version>
     </parent>
 
     <dependencies>
@@ -59,6 +59,11 @@
     </dependencies>
 
     <build>
+      <testResources>
+        <testResource>
+          <directory>src/test/resources</directory>
+        </testResource>
+      </testResources>
       <plugins>
         <plugin>
           <groupId>org.springframework.boot</groupId>

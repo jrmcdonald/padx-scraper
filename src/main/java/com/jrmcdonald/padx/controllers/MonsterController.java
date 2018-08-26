@@ -10,7 +10,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * MonsterController
+ * Monster Controller
+ * 
+ * <p>Exposes REST endpoints for accessing monster data.
+ * 
+ * @author Jamie McDonald
+ * @since 0.2
  */
 @RestController
 @RequestMapping("/api")
@@ -19,11 +24,17 @@ public class MonsterController {
     @Autowired
     private MonsterRepository monsters;
 
+    /**
+     * Return a JSON representation of all monsters.
+     */
     @RequestMapping("/monsters")
     public Iterable<Monster> getMonsters() {
         return monsters.findAll();
     }
 
+    /**
+     * Return a JSON representation of a single monster.
+     */
     @RequestMapping("/monsters/{id}")
     public Monster getMonsterById(@PathVariable long id) {
         return monsters.findById(id).orElseThrow(() -> new MonsterNotFoundException());

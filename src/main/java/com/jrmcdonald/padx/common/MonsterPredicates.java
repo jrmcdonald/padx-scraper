@@ -1,36 +1,38 @@
 package com.jrmcdonald.padx.common;
 
 import java.util.function.Predicate;
+
 import org.jsoup.nodes.Element;
 
+/**
+ * Monster Predicates
+ * 
+ * @author Jamie McDonald
+ * @since 0.2
+ */
 public final class MonsterPredicates {
 
+    /**
+     * Should only be called statically
+     */
     private MonsterPredicates() {}
 
-    public static Predicate<Element> isDesirableEvolutionChartRow() {
-        return e -> !("Evolution Chart".equalsIgnoreCase(e.text()))
-                && e.getElementsByAttributeValue("src", "img/evolvearrow5.png").isEmpty()
-                && e.getElementsByClass("devolution").isEmpty();
+    /**
+     * Check if the link element contains the "pets/" string.
+     * 
+     * @return predicate
+     */
+    public static Predicate<Element> containsMonsterHrefAttr() {
+        return e -> e.attr("href").contains(Constants.SKY_FRAGMENT_MONSTER);
     }
 
-    public static Predicate<Element> isFinalEvolve() {
-        return e -> !(e.getElementsByClass("finalevolve").isEmpty());
-    }
-
-    public static Predicate<Element> isAwokenEvolve() {
-        return e -> !(e.getElementsByClass("awokenevolve").isEmpty());
-    }
-
-    public static Predicate<Element> isUltimateToUltimate() {
-        return e -> e.getElementsByClass("awokenevolve").first().getElementsByAttributeValueContaining("alt", "Reincarnated").isEmpty();
-    }
-
-    public static Predicate<Element> isReincarnation() {
-        return e -> !(e.getElementsByClass("awokenevolve").first().getElementsByAttributeValueContaining("alt", "Reincarnated").isEmpty());
-    }
-    
-    public static Predicate<Element> containsMonsterBookId(long id) {
-        return e -> !(e.getElementsByAttributeValue("data-original", "img/book/" + id + ".png").isEmpty());
+    /**
+     * Check if the document has an evolution list.
+     * 
+     * @return predicate
+     */
+    public static Predicate<Element> containsEvolutionList() {
+        return e -> e.getElementsContainingOwnText("此寵物沒有進化").isEmpty();
     }
 
 }

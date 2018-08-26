@@ -16,7 +16,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
- * StatusRepositoryTest
+ * Status Repository Test
+ * 
+ * @author Jamie McDonald
+ * @since 0.2
  */
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -25,8 +28,11 @@ public class StatusRepositoryTest extends BaseTest {
     @Autowired
     private StatusRepository statusRepository;
 
+    /**
+     * Test that the repository returns the correct most recent status.
+     */
     @Test
-    public void testPersistAndFindLatestStatus() {
+    public void givenMultipleStatuses_whenFindLatestStatus_thenReturnsStatus() {
         Status status = new Status(StatusEnum.UPDATING, new Date(), 0L);
         statusRepository.save(status);
 

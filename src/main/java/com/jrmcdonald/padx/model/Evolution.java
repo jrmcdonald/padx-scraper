@@ -16,24 +16,40 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * Evolution Model
+ * 
+ * @author Jamie McDonald
+ * @since 0.2
+ */
 @Entity
 public class Evolution {
 
+    /**
+     * Auto-generated id field
+     */
     @Id
     @JsonIgnore
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
+    /** 
+     * The evolution target
+     */
     private Long evolution;
-    private boolean ultimate;
-    private boolean reincarnation;
 
+    /**
+     * A map of evolution materials and counts
+     */
     @ElementCollection(fetch = FetchType.EAGER)
     @MapKeyColumn(name="material_id")
     @Column(name="material_count")
     @CollectionTable(name="evolution_materials", joinColumns=@JoinColumn(name="evolution_id"))
     private Map<Long, AtomicLong> materials = new HashMap<Long, AtomicLong>();
 
+    /**
+     * The {@link Monster} object that this evolution belongs to
+     */
     @JsonIgnore
     @ManyToOne
     private Monster monster;
@@ -67,34 +83,6 @@ public class Evolution {
     }
 
     /**
-     * @return the ultimate
-     */
-    public boolean isUltimate() {
-      return ultimate;
-    }
-
-    /**
-     * @param ultimate the ultimate to set
-     */
-    public void setUltimate(boolean ultimate) {
-      this.ultimate = ultimate;
-    }
-
-    /**
-     * @return the reincarnation
-     */
-    public boolean isReincarnation() {
-      return reincarnation;
-    }
-
-    /**
-     * @param reincarnation the reincarnation to set
-     */
-    public void setReincarnation(boolean reincarnation) {
-      this.reincarnation = reincarnation;
-    }
-
-    /**
      * @return the materials
      */
     public Map<Long, AtomicLong> getMaterials() {
@@ -109,6 +97,8 @@ public class Evolution {
     }
 
     /**
+     * Add a material to the {@link #materials} map or increment the count if it exists
+     * 
      * @param materialId the material to add or increment
      */
     public void putOrIncrementMaterial(long materialId) {
@@ -133,8 +123,8 @@ public class Evolution {
     @Override
     public String toString() {
         return String.format(
-                "Evolution[evolution=%d, ultimate='%s', reincarnation='%s' materials='%s']",
-                evolution, ultimate, reincarnation, materials);
+                "Evolution[evolution=%d, materials='%s']",
+                evolution, materials);
     }
 
 }
