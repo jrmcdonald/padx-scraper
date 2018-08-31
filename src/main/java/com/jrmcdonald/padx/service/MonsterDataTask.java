@@ -73,20 +73,19 @@ public class MonsterDataTask implements Callable<Monster> {
         Monster monster = null;
 
         try {
-            logger.info("Loading data for monster {}",  id);
+            logger.debug("Loading data for monster {}.",  id);
 
             Document pdxHTML = loadDocumentFromPDX(id);
             Document skyHTML = loadDocumentFromSKY(id);
 
             monster = parseMonsterDetails(id, pdxHTML, skyHTML);
-        } catch (InvalidMonsterException ex) {
-            logger.warn("Unable to process data for monster id {}: {}", id, ex);
-        } catch (IOException ex) {
-            logger.error("Unable to load data for monster id {}: {}", id, ex);
-        }
 
-        // store in the database
-        monsters.save(monster);
+            // store in the database
+            monsters.save(monster);
+            logger.info("Loaded data for monster {}.", id);
+        } catch (InvalidMonsterException | IOException ex) {
+            logger.error("Unable to build monster id {}:", id, ex);
+        }
 
         return monster;
     }
@@ -151,7 +150,9 @@ public class MonsterDataTask implements Callable<Monster> {
                 doc = Jsoup.connect(url).maxBodySize(0).get();
                 break; 
             }
-            catch (SocketTimeoutException e){
+            catch (IOException e){
+                logger.debug("Connection error whilst fetching {} on attempt {}, waiting {}ms and retrying.", url, i, waitTime);
+
                 try {
                     Thread.sleep(waitTime);
                 } catch (InterruptedException iex) {
