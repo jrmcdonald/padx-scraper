@@ -32,7 +32,7 @@ public final class MonsterPredicates {
      * @return predicate
      */
     public static Predicate<Element> containsEvolutionList() {
-        return e -> e.getElementsContainingOwnText("此寵物沒有進化").isEmpty();
+        return e -> e.getElementsContainingOwnText("此寵物沒有進化").isEmpty() && e.getElementsContainingOwnText("的寵物尚未實裝").isEmpty();
     }
 
 }
