@@ -1,7 +1,6 @@
 package com.jrmcdonald.padx.service;
 
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.util.concurrent.Callable;
 
 import com.jrmcdonald.padx.common.Constants;
@@ -44,6 +43,12 @@ public class MonsterDataTask implements Callable<Monster> {
     private int maxRetries;
 
     /**
+     * Property specified time to wait between retries
+     */
+    @Value("${connection.waittime}")
+    private int waitTime;
+
+    /**
      * Monster id to fetch
      */
     private final long id;
@@ -67,56 +72,99 @@ public class MonsterDataTask implements Callable<Monster> {
         Monster monster = null;
 
         try {
-            logger.info("Loading data for monster {}",  id);
+            logger.debug("Loading data for monster {}.",  id);
 
-            monster = new Monster();
-            monster.setId(id);
+            Document pdxHTML = loadDocumentFromPDX(id);
+            Document skyHTML = loadDocumentFromSKY(id);
 
-            Document padxHTML = null;
+            monster = parseMonsterDetails(id, pdxHTML, skyHTML);
 
-            // Attempt to connect and load the HTML into the doc object
-            for (int i = 0; i < maxRetries; i++) {
-                try{
-                    padxHTML = Jsoup.connect(Constants.PADX_BASE_URL + Constants.PADX_FRAGMENT_MONSTER + id).maxBodySize(0).get();
-                    break; 
-                }
-                catch (SocketTimeoutException e){
-                    if (i == maxRetries - 1) {
-                        throw e;
-                    }
-                }                 
-            }
-
-            Document skyHTML = null;
-
-            // Attempt to connect and load the HTML into the doc object
-            for (int i = 0; i < maxRetries; i++) {
-                try{
-                    skyHTML = Jsoup.connect(Constants.SKY_BASE_URL + Constants.SKY_FRAGMENT_MONSTER + id).maxBodySize(0).get();
-                    break; 
-                }
-                catch (SocketTimeoutException e){
-                    if (i == maxRetries - 1) {
-                        throw e;
-                    }
-                }                 
-            }
-            
-            // set basic monster details
-            monster.setName(MonsterHelpers.getMonsterNameFromDoc(padxHTML));
-            monster.setType(MonsterHelpers.getMonsterTypeFromDoc(padxHTML));
-
-            // determine evolutions
-            EvolutionHelpers.determineEvolutionsForMonster(monster, skyHTML);
-        } catch (InvalidMonsterException ex) {
-            logger.warn("Unable to process data for monster id {}: {}", id, ex);
-        } catch (IOException ex) {
-            logger.error("Unable to load data for monster id {}: {}", id, ex);
+            // store in the database
+            monsters.save(monster);
+            logger.info("Loaded data for monster {}.", id);
+        } catch (InvalidMonsterException | IOException ex) {
+            logger.error("Unable to build monster id {}:", id, ex);
         }
 
-        // store in the database
-        monsters.save(monster);
+        return monster;
+    }
+
+    /**
+     * Parse monster details from the supplied documents.
+     * 
+     * @param id the id of the monster
+     * @param pdxHTML the PDX html document
+     * @param skyHTML the Skyozora html document
+     * @return a new monster object
+     * @throws InvalidMonsterException
+     */
+    private Monster parseMonsterDetails(long id, Document pdxHTML, Document skyHTML) throws InvalidMonsterException {
+        Monster monster = new Monster();
+        monster.setId(id);
+
+        // set basic monster details
+        monster.setName(MonsterHelpers.getMonsterNameFromDoc(pdxHTML));
+        monster.setType(MonsterHelpers.getMonsterTypeFromDoc(pdxHTML));
+
+        // determine evolutions
+        EvolutionHelpers.determineEvolutionsForMonster(monster, skyHTML);
 
         return monster;
+    }
+
+    /**
+     * Load PDX data for the supplied monster id.
+     * 
+     * @param id the monster id
+     * @return the loaded document
+     * @throws IOException if there was an error fetching the document
+     */
+    private Document loadDocumentFromPDX(long id) throws IOException {
+        return loadDocumentFromURL(Constants.PADX_BASE_URL + Constants.PADX_FRAGMENT_MONSTER + id);
+    }
+
+    /**
+     * Load Skyozora data for the supplied monster id.
+     * 
+     * @param id the monster id
+     * @return the loaded document
+     * @throws IOException if there was an error fetching the document
+     */
+    private Document loadDocumentFromSKY(long id) throws IOException {
+        return loadDocumentFromURL(Constants.SKY_BASE_URL + Constants.SKY_FRAGMENT_MONSTER + id);
+    }
+
+    /**
+     * Use jsoup to get the document for the supplied URL.
+     * 
+     * @param url the url to fetch
+     * @return the loaded document
+     * @throws IOException if there was an error fetching the document
+     */
+    private Document loadDocumentFromURL(String url) throws IOException {
+        Document doc = null;
+
+        for (int i = 0; i < maxRetries; i++) {
+            try{
+                doc = Jsoup.connect(url).maxBodySize(0).get();
+                break; 
+            }
+            catch (IOException e){
+                logger.debug("Connection error whilst fetching {} on attempt {}, waiting {}ms and retrying.", url, i, waitTime);
+
+                try {
+                    Thread.sleep(waitTime);
+                } catch (InterruptedException iex) {
+                    logger.error("Thread interrupted during sleep: ", iex);
+                    Thread.currentThread().interrupt();
+                }
+                
+                if (i == maxRetries - 1) {
+                    throw e;
+                }
+            }                 
+        }
+
+        return doc;
     }
 }

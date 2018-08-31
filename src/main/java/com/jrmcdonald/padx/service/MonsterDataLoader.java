@@ -57,7 +57,7 @@ public class MonsterDataLoader implements CommandLineRunner {
     public void run(String... args) {
         try {
             long startTime = System.nanoTime();
-            logger.info("Started execution");
+            logger.info("Started loading monsters.");
 
             statusRepository.save(new Status(StatusEnum.UPDATING, new Date(), 0L));
 
@@ -67,25 +67,27 @@ public class MonsterDataLoader implements CommandLineRunner {
                     .map(task -> taskExecutor.submit(task))
                     .collect(Collectors.toCollection(ArrayList::new));
 
+            ArrayList<Monster> monsters = new ArrayList<Monster>();
+
             // ensure all have completed
             for (Future<Monster> result : results) {
                 try {
-                    result.get();
+                    monsters.add(result.get());
                 } catch (InterruptedException | ExecutionException ex) {
-                    ex.printStackTrace();
+                    logger.error("Exception during execution of MonsterDataTask:", ex);
                 }
             }
 
             taskExecutor.shutdown();
 
-            statusRepository.save(new Status(StatusEnum.READY, new Date(), results.size()));
+            statusRepository.save(new Status(StatusEnum.READY, new Date(), monsters.size()));
 
             long endTime = System.nanoTime();
             long duration = (endTime - startTime) / 1000000 / 1000;
 
-            logger.info("Finished execution. Completed in {}s", duration);
+            logger.info("Finished loading monsters. Completed in {}s.", duration);
         } catch (Exception e) {
-            logger.error("An unexpected exception occurred: ", e);
+            logger.error("An unexpected exception occurred:", e);
         }
     }
     

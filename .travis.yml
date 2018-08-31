@@ -1,8 +1,8 @@
 stages:
   - name: test 
-    if: branch = development
+    if: (NOT branch = master) OR (branch = master AND tag = false)
   - name: deploy
-    if: branch = master
+    if: branch = master AND tag = true
 jobs:
   include:
     - stage: test
