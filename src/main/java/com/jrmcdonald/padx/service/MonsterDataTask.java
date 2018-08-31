@@ -1,7 +1,6 @@
 package com.jrmcdonald.padx.service;
 
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.util.concurrent.Callable;
 
 import com.jrmcdonald.padx.common.Constants;
