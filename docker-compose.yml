@@ -1,0 +1,11 @@
+version: '3.3'
+
+services:
+   app:
+     image: jrmcdonald/padx-scraper:0.3.0
+     restart: always
+     ports:
+      - 8080:8080
+     environment:
+      - LOGGING_LEVEL_COM_JRMCDONALD=INFO
+      - SPRING_PROFILES_ACTIVE=prod
