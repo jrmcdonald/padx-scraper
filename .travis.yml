@@ -1,6 +1,6 @@
 stages:
   - name: test 
-    if: tag = false
+    if: (NOT branch = master) OR (branch = master AND tag = false)
   - name: deploy
     if: branch = master AND tag = true
 jobs:
