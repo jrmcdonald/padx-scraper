@@ -1,8 +1,8 @@
 stages:
   - name: test 
-    if: (NOT branch = master) OR (branch = master AND tag = false)
+    if: (NOT branch = master) OR (branch = master AND NOT tag is present)
   - name: deploy
-    if: branch = master AND tag = true
+    if: branch = master AND tag IS present AND NOT type = pull_request
 jobs:
   include:
     - stage: test
